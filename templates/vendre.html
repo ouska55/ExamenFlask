@@ -76,8 +76,8 @@
 
         .button-container {
     position: fixed;
-    bottom: 20px;  /* Distance depuis le bas */
-    left: 20px;    /* Distance depuis la gauche */
+    bottom: 20px;  
+    left: 20px;    
 }
 
 .button-container a {
@@ -143,7 +143,6 @@
                 <p>Total : <span id="totalAmount">0</span> F</p>
             </div>
         
-            <!-- Champs cachés pour envoyer les données -->
             <input type="hidden" id="articleList" name="article">
             <input type="hidden" id="totalAmountHidden" name="total">
             
@@ -158,19 +157,16 @@
         let total = 0;
         const orderList = [];
 
-        // Fonction pour mettre à jour le total
         function updateTotal() {
             document.getElementById('totalAmount').textContent = total;
         }
 
-        // Fonction pour ajouter un produit à la commande
         function addProductToOrder(productName, productPrice) {
             total += productPrice;
             orderList.push(productName);
             updateTotal();
         }
 
-        // Ajouter un écouteur d'événement pour chaque bouton "Ajouter"
         const buttons = document.querySelectorAll('.product-button');
         buttons.forEach(button => {
             button.addEventListener('click', () => {
@@ -180,7 +176,6 @@
             });
         });
 
-        // Fonction pour valider la commande
         document.getElementById('submitButton').addEventListener('click', function() {
             if (orderList.length > 0) {
                 alert('Commande validée :\n' + orderList.join('\n') + '\nTotal à payer : ' + total + ' F');
@@ -190,14 +185,12 @@
         });
 
         document.getElementById('submitButton').addEventListener('click', function(event) {
-    event.preventDefault();  // Empêche l'envoi immédiat du formulaire
+    event.preventDefault();  
 
     if (orderList.length > 0) {
-        // Mettre à jour les champs cachés avec les informations nécessaires
         document.getElementById('articleList').value = orderList.join(', ');
         document.getElementById('totalAmountHidden').value = total;
 
-        // Soumettre le formulaire
         document.getElementById('orderForm').submit();
     } else {
         alert('Veuillez ajouter au moins un article à votre commande.');

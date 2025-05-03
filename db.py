@@ -1,11 +1,9 @@
 import sqlite3
 from datetime import datetime
 
-# Connexion à la base de données (création de la base de données mun.db si elle n'existe pas)
 conn = sqlite3.connect('fatoubr.db')
 cursor = conn.cursor()
 
-# Création de la table 'ventes'
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS ventes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,7 +13,6 @@ CREATE TABLE IF NOT EXISTS ventes (
 );
 ''')
 
-# Création de la table 'stocks'
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS stocks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,7 +22,6 @@ CREATE TABLE IF NOT EXISTS stocks (
 );
 ''')
 
-# Sauvegarder les changements et fermer la connexion
 conn.commit()
 conn.close()
 

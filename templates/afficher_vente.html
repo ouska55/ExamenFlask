@@ -131,7 +131,6 @@
                     </tr>
                 </thead>
                 <tbody id="salesData">
-                    <!-- Les données des ventes seront insérées ici -->
                 </tbody>
             </table>
             <p id="no-data" class="no-data"></p>
@@ -144,10 +143,8 @@
         document.getElementById('searchForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Récupérer la date du formulaire
             const date = document.getElementById('date').value;
 
-            // Si une date est sélectionnée
             if (date) {
                 fetch('/afficher_ventes/' + date)
                     .then(response => response.json())
@@ -156,12 +153,9 @@
                         const salesData = document.getElementById('salesData');
                         const noData = document.getElementById('no-data');
 
-                        // Vider le tableau existant
                         salesData.innerHTML = '';
 
-                        // Vérifier s'il y a des ventes pour la date donnée
                         if (data.length > 0) {
-                            // Afficher les ventes dans le tableau
                             data.forEach(sale => {
                                 const row = document.createElement('tr');
                                 row.innerHTML = `

@@ -104,7 +104,6 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Les produits seront affichés ici -->
         </tbody>
     </table>
 </div>
@@ -113,7 +112,6 @@
 </div>
 
 <script>
-    // Fonction pour ajouter un produit au stock
     function ajouterStock() {
         const produit = document.getElementById('produit').value;
         const quantite = parseInt(document.getElementById('quantite').value);
@@ -140,7 +138,6 @@
         });
     }
 
-    // Fonction pour afficher le stock
     function afficherStock() {
         fetch('/afficher_stock')
         .then(response => response.json())
@@ -164,7 +161,6 @@
         });
     }
 
-    // Fonction pour déduire une quantité
     function deduireQuantite(id) {
         const quantite = prompt("Entrez la quantité à déduire :");
         if (quantite && !isNaN(quantite)) {
@@ -178,7 +174,6 @@
         }
     }
 
-    // Fonction pour supprimer un produit
     function supprimerStock(id) {
         if (confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
             fetch('/supprimer_stock', {
@@ -191,7 +186,6 @@
         }
     }
 
-    // Afficher le stock dès le chargement de la page
     window.onload = afficherStock;
 </script>
 
