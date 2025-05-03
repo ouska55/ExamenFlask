@@ -6,20 +6,16 @@ from flask import jsonify
 app = Flask(__name__)
 def ajouter_vente(article, total):
     try:
-        # Connexion à la base de données
         conn = sqlite3.connect('fatoubr.db')
         cursor = conn.cursor()
 
-        # Obtenir la date actuelle au format 'YYYY-MM-DD'
         date_vente = datetime.now().strftime('%Y-%m-%d')
 
-        # Insertion des données dans la table 'ventes'
         cursor.execute('''
             INSERT INTO ventes (article, total, date)
             VALUES (?, ?, ?)
         ''', (article, total, date_vente))
 
-        # Sauvegarder les changements et fermer la connexion
         conn.commit()
         print("Vente ajoutée avec succès !")
 
@@ -27,31 +23,24 @@ def ajouter_vente(article, total):
         print(f"Erreur lors de l'ajout de la vente : {e}")
 
     finally:
-        # Fermer la connexion
         conn.close()
 
-# Fonction pour obtenir les ventes d'une date donnée
 def get_ventes_by_date(date):
     try:
-        # Connexion à la base de données
         conn = sqlite3.connect('fatoubr.db')
         cursor = conn.cursor()
 
-        # Récupérer les ventes de la date spécifiée
         cursor.execute("SELECT article, total, date FROM ventes WHERE date = ?", (date,))
         ventes = cursor.fetchall()
 
-        # Fermer la connexion
         conn.close()
 
-        # Retourner les résultats
         return ventes
 
     except sqlite3.Error as e:
         print(f"Erreur lors de la récupération des ventes : {e}")
         return []
 
-# Route pour la page "index.html"
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -64,21 +53,17 @@ def index():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    # Récupérer les données envoyées par le formulaire
     article = request.form['article']
     total = request.form['total']
 
-    # Ajouter la vente dans la base de données
     ajouter_vente(article, total)
 
     return 'Commande reçue et traitée avec succès !'
 
 @app.route('/afficher_ventes/<date>', methods=['GET'])
 def afficher_ventes(date):
-    # Récupérer les ventes pour la date spécifiée
     ventes = get_ventes_by_date(date)
 
-    # Renvoyer les résultats en JSON
     if ventes:
         return jsonify([{
             'article': vente[0],
@@ -89,7 +74,6 @@ def afficher_ventes(date):
         return jsonify([])
     
 
-# Route pour la page "vendre.html"
 @app.route('/vendre')
 def vendre():
     return render_template('vendre.html')
@@ -109,7 +93,7 @@ def get_db():
     conn = sqlite3.connect('fatoubr.db')
     conn.row_factory = sqlite3.Row
     return conn
-# Route pour ajouter un produit au stock
+
 @app.route('/ajouter_stock', methods=['POST'])
 def ajouter_stock():
     try:
@@ -131,7 +115,6 @@ def ajouter_stock():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-# Route pour afficher le stock
 @app.route('/afficher_stock')
 def afficher_stock():
     conn = get_db()
@@ -141,7 +124,6 @@ def afficher_stock():
     conn.close()
     return jsonify({'stock': [dict(row) for row in stock]})
 
-# Route pour déduire la quantité d'un produit
 @app.route('/deduire_quantite_stock', methods=['POST'])
 def deduire_quantite_stock():
     try:
@@ -168,7 +150,6 @@ def deduire_quantite_stock():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-# Route pour supprimer un produit
 @app.route('/supprimer_stock', methods=['POST'])
 def supprimer_stock():
     try:
