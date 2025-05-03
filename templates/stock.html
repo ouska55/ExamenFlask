@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion du Stock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container input {
+            margin: 5px;
+            padding: 8px;
+            width: 200px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .button-container {
+    position: fixed;
+    bottom: 20px;  /* Distance depuis le bas */
+    left: 20px;    /* Distance depuis la gauche */
+}
+
+.button-container a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #45a049;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.button-container a:hover {
+    background-color: #45a049;
+}
+    </style>
+</head>
+<body>
+
+<h1>Gestion du Stock</h1>
+
+<div class="form-container">
+    <input type="text" id="produit" placeholder="Nom du produit" required>
+    <input type="number" id="quantite" placeholder="Quantité" required>
+    <input type="number" id="prix" placeholder="Prix" required>
+    <button class="btn" onclick="ajouterStock()">Ajouter au Stock</button>
+    <p id="error-message" class="error"></p>
+</div>
+
+<div class="table-container">
+    <h3>Liste des Produits en Stock</h3>
+    <table id="stock-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Les produits seront affichés ici -->
+        </tbody>
+    </table>
+</div>
+<div class="button-container"> 
+    <a href="http://127.0.0.1:5000/index">Main Menu</a>
+</div>
+
+<script>
+    // Fonction pour ajouter un produit au stock
+    function ajouterStock() {
+        const produit = document.getElementById('produit').value;
+        const quantite = parseInt(document.getElementById('quantite').value);
+        const prix = parseFloat(document.getElementById('prix').value);
+
+        if (!produit || isNaN(quantite) || isNaN(prix)) {
+            document.getElementById('error-message').innerText = "Veuillez remplir tous les champs correctement.";
+            return;
+        }
+
+        fetch('/ajouter_stock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ produit, quantite, prix })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('error-message').innerText = "";
+                afficherStock();
+            } else {
+                document.getElementById('error-message').innerText = data.message;
+            }
+        });
+    }
+
+    // Fonction pour afficher le stock
+    function afficherStock() {
+        fetch('/afficher_stock')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.querySelector('#stock-table tbody');
+            tableBody.innerHTML = '';
+            data.stock.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.produit}</td>
+                    <td>${item.quantite}</td>
+                    <td>${item.prix}</td>
+                    <td>
+                        <button class="btn" onclick="deduireQuantite(${item.id})">Déduire Quantité</button>
+                        <button class="btn" onclick="supprimerStock(${item.id})">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        });
+    }
+
+    // Fonction pour déduire une quantité
+    function deduireQuantite(id) {
+        const quantite = prompt("Entrez la quantité à déduire :");
+        if (quantite && !isNaN(quantite)) {
+            fetch('/deduire_quantite_stock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, quantite: parseInt(quantite) })
+            })
+            .then(response => response.json())
+            .then(data => afficherStock());
+        }
+    }
+
+    // Fonction pour supprimer un produit
+    function supprimerStock(id) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
+            fetch('/supprimer_stock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            })
+            .then(response => response.json())
+            .then(data => afficherStock());
+        }
+    }
+
+    // Afficher le stock dès le chargement de la page
+    window.onload = afficherStock;
+</script>
+
+</body>
+</html>

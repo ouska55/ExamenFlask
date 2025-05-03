@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afficher les Ventes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .table-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .no-data {
+            color: red;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .button-container {
+    position: fixed;
+    bottom: 20px;  /* Distance depuis le bas */
+    left: 20px;    /* Distance depuis la gauche */
+}
+
+.button-container a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #45a049;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.button-container a:hover {
+    background-color: #45a049;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Afficher les Ventes</h1>
+        <form id="searchForm">
+            <div class="form-group">
+                <label for="date">Sélectionnez une date :</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <button type="submit">Afficher les Ventes</button>
+        </form>
+
+        <div id="table-container" class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Article</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="salesData">
+                    <!-- Les données des ventes seront insérées ici -->
+                </tbody>
+            </table>
+            <p id="no-data" class="no-data"></p>
+        </div>
+    </div>
+    <div class="button-container"> 
+        <a href="http://127.0.0.1:5000/index">Main Menu</a>
+    </div>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Récupérer la date du formulaire
+            const date = document.getElementById('date').value;
+
+            // Si une date est sélectionnée
+            if (date) {
+                fetch('/afficher_ventes/' + date)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableContainer = document.getElementById('table-container');
+                        const salesData = document.getElementById('salesData');
+                        const noData = document.getElementById('no-data');
+
+                        // Vider le tableau existant
+                        salesData.innerHTML = '';
+
+                        // Vérifier s'il y a des ventes pour la date donnée
+                        if (data.length > 0) {
+                            // Afficher les ventes dans le tableau
+                            data.forEach(sale => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${sale.article}</td>
+                                    <td>${sale.total} F</td>
+                                    <td>${sale.date}</td>
+                                `;
+                                salesData.appendChild(row);
+                            });
+                            noData.style.display = 'none';
+                            tableContainer.style.display = 'block';
+                        } else {
+                            noData.textContent = 'Aucune vente trouvée pour cette date.';
+                            noData.style.display = 'block';
+                            tableContainer.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

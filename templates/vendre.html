@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande de Burgers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .product {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-name {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .product-button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .product-button:hover {
+            background-color: #45a049;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .button-container {
+    position: fixed;
+    bottom: 20px;  /* Distance depuis le bas */
+    left: 20px;    /* Distance depuis la gauche */
+}
+
+.button-container a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #45a049;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.button-container a:hover {
+    background-color: #45a049;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Menu 🍽️ </h1>
+        <form id="orderForm" action="/submit" method="POST">
+            <div class="product">
+                <span class="product-name">Cheese burger - 3500f</span>
+                <button type="button" class="product-button" data-price="3500" data-name="Cheese burger">Ajouter</button>
+            </div>
+            <div class="product">
+                        <span class="product-name">Double cheese - 5000f</span>
+                        <button type="button" class="product-button" data-price="5000" data-name="Double cheese">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Dkr burger - 4000f</span>
+                        <button type="button" class="product-button" data-price="4000" data-name="Dkr burger">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Burger pain arabe - 3000f</span>
+                        <button type="button" class="product-button" data-price="3000" data-name="Burger pain arabe">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Taouk poulet - 3500f</span>
+                        <button type="button" class="product-button" data-price="3500" data-name="Taouk poulet">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Crispy chicken - 5000f</span>
+                        <button type="button" class="product-button" data-price="5000" data-name="Crispy chicken">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Hot dog - 3000f</span>
+                        <button type="button" class="product-button" data-price="3000" data-name="Hot dog">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Péné poulet crème - 5500f</span>
+                        <button type="button" class="product-button" data-price="5500" data-name="Péné poulet crème">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Panini jambon - 3000f</span>
+                        <button type="button" class="product-button" data-price="3000" data-name="Panini jambon">Ajouter</button>
+                    </div>
+                    <div class="product">
+                        <span class="product-name">Panini poulet - 3500f</span>
+                        <button type="button" class="product-button" data-price="3500" data-name="Panini poulet">Ajouter</button>
+                    </div>
+        
+            <div class="total">
+                <p>Total : <span id="totalAmount">0</span> F</p>
+            </div>
+        
+            <!-- Champs cachés pour envoyer les données -->
+            <input type="hidden" id="articleList" name="article">
+            <input type="hidden" id="totalAmountHidden" name="total">
+            
+            <button type="submit" id="submitButton">Valider la commande</button>
+        </form>
+    </div>
+    <div class="button-container"> 
+        <a href="http://127.0.0.1:5000/index">Main Menu</a>
+    </div>
+
+    <script>
+        let total = 0;
+        const orderList = [];
+
+        // Fonction pour mettre à jour le total
+        function updateTotal() {
+            document.getElementById('totalAmount').textContent = total;
+        }
+
+        // Fonction pour ajouter un produit à la commande
+        function addProductToOrder(productName, productPrice) {
+            total += productPrice;
+            orderList.push(productName);
+            updateTotal();
+        }
+
+        // Ajouter un écouteur d'événement pour chaque bouton "Ajouter"
+        const buttons = document.querySelectorAll('.product-button');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productName = button.getAttribute('data-name');
+                const productPrice = parseInt(button.getAttribute('data-price'));
+                addProductToOrder(productName, productPrice);
+            });
+        });
+
+        // Fonction pour valider la commande
+        document.getElementById('submitButton').addEventListener('click', function() {
+            if (orderList.length > 0) {
+                alert('Commande validée :\n' + orderList.join('\n') + '\nTotal à payer : ' + total + ' F');
+            } else {
+                alert('Veuillez ajouter au moins un article à votre commande.');
+            }
+        });
+
+        document.getElementById('submitButton').addEventListener('click', function(event) {
+    event.preventDefault();  // Empêche l'envoi immédiat du formulaire
+
+    if (orderList.length > 0) {
+        // Mettre à jour les champs cachés avec les informations nécessaires
+        document.getElementById('articleList').value = orderList.join(', ');
+        document.getElementById('totalAmountHidden').value = total;
+
+        // Soumettre le formulaire
+        document.getElementById('orderForm').submit();
+    } else {
+        alert('Veuillez ajouter au moins un article à votre commande.');
+    }
+});
+    </script>
+</body>
+</html>
